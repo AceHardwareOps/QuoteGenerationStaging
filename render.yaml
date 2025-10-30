@@ -1,4 +1,28 @@
 # Exported from Render on 2025-10-30T01:19:45Z
+envVarGroups:
+  - name: staging-shared-db-config-ace
+    envVars:
+      - key: POSTGRES_SCHEMA
+        value: chatwoot
+      - key: RAILS_ENV
+        value: production
+      - key: NODE_ENV
+        value: production
+      - key: INSTALLATION_ENV
+        value: render
+      - key: DISABLE_DATABASE_ENVIRONMENT_CHECK
+        value: "1"
+      - key: ACTIVE_STORAGE_SERVICE
+        value: local
+      - key: RAILS_LOG_TO_STDOUT
+        value: "true"
+      - key: LOG_LEVEL
+        value: info
+      - key: ENABLE_ACCOUNT_SIGNUP
+        value: "false"
+      - key: FORCE_SSL
+        value: "false"
+
 version: "1"
 projects:
   - name: Ace Quote Generation
@@ -110,7 +134,7 @@ projects:
                 sync: false
               - key: INSTANCE_NAME
                 sync: false
-              - fromGroup: shared-db-config-ace
+              - fromGroup: staging-shared-db-config-ace
             region: frankfurt
             preDeployCommand: bundle exec rails db:chatwoot_prepare
             dockerCommand: bundle exec rails s -b 0.0.0.0 -p 3000
@@ -181,7 +205,7 @@ projects:
                   property: host
               - key: INSTANCE_NAME
                 sync: false
-              - fromGroup: shared-db-config-ace
+              - fromGroup: staging-shared-db-config-ace
             region: frankfurt
             dockerCommand: bundle exec sidekiq -C config/sidekiq.yml
             autoDeployTrigger: commit
