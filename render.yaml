@@ -28,11 +28,11 @@ projects:
                 sync: false
               - key: DB_POSTGRESDB_PASSWORD
                 fromDatabase:
-                  name: shared-db
+                  name: staging-shared-db
                   property: password
               - key: DB_POSTGRESDB_HOST
                 fromDatabase:
-                  name: shared-db
+                  name: staging-shared-db
                   property: host
               - key: DB_POSTGRESDB_DATABASE
                 sync: false
@@ -98,13 +98,13 @@ projects:
                 sync: false
               - key: POSTGRES_PASSWORD
                 fromDatabase:
-                  name: shared-db
+                  name: staging-shared-db
                   property: password
               - key: POSTGRES_USERNAME
                 sync: false
               - key: POSTGRES_HOST
                 fromDatabase:
-                  name: shared-db
+                  name: staging-shared-db
                   property: host
               - key: RAILS_MASTER_KEY
                 sync: false
@@ -171,13 +171,13 @@ projects:
                 sync: false
               - key: POSTGRES_PASSWORD
                 fromDatabase:
-                  name: shared-db
+                  name: staging-shared-db
                   property: password
               - key: POSTGRES_USERNAME
                 sync: false
               - key: POSTGRES_HOST
                 fromDatabase:
-                  name: shared-db
+                  name: staging-shared-db
                   property: host
               - key: INSTANCE_NAME
                 sync: false
