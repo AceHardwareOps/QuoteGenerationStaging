@@ -1,0 +1,204 @@
+# Exported from Render on 2025-10-30T01:19:45Z
+version: "1"
+projects:
+  - name: Ace Quote Generation
+    environments:
+      - name: Staging
+        services:
+          - type: web
+            name: staging-n8n-service
+            runtime: image
+            image:
+              url: docker.io/n8nio/n8n:latest
+            plan: starter
+            envVars:
+              - key: N8N_PROXY_HOPS
+                sync: false
+              - key: N8N_RUN_MIGRATIONS
+                sync: false
+              - key: NODE_OPTIONS
+                sync: false
+              - key: N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS
+                sync: false
+              - key: WEBHOOK_URL
+                sync: false
+              - key: DB_POSTGRESDB_SCHEMA
+                sync: false
+              - key: DB_POSTGRESDB_USER
+                sync: false
+              - key: DB_POSTGRESDB_PASSWORD
+                fromDatabase:
+                  name: shared-db
+                  property: password
+              - key: DB_POSTGRESDB_HOST
+                fromDatabase:
+                  name: shared-db
+                  property: host
+              - key: DB_POSTGRESDB_DATABASE
+                sync: false
+              - key: DB_TYPE
+                sync: false
+              - key: N8N_ENCRYPTION_KEY
+                sync: false
+            region: frankfurt
+            autoDeployTrigger: commit
+          - type: web
+            name: staging-chatwoot-service
+            runtime: image
+            image:
+              url: docker.io/chatwoot/chatwoot:v4.7.0
+            plan: starter
+            envVars:
+              - key: GCS_CREDENTIALS
+                sync: false
+              - key: GCS_BUCKET
+                sync: false
+              - key: GCS_PROJECT
+                sync: false
+              - key: ACTIVE_STORAGE_SERVICE
+                sync: false
+              - key: gcs-creds.json
+                sync: false
+              - key: FRONTEND_URL
+                sync: false
+              - key: SMTP_TLS
+                sync: false
+              - key: SMTP_SSL
+                sync: false
+              - key: SMTP_OPENSSL_VERIFY_MODE
+                sync: false
+              - key: SMTP_USERNAME
+                sync: false
+              - key: SMTP_ENABLE_STARTTLS_AUTO
+                sync: false
+              - key: SECRET_KEY_BASE
+                sync: false
+              - key: SMTP_AUTHENTICATION
+                sync: false
+              - key: SMTP_DOMAIN
+                sync: false
+              - key: SMTP_PORT
+                sync: false
+              - key: SMTP_PASSWORD
+                sync: false
+              - key: SMTP_ADDRESS
+                sync: false
+              - key: MAILER_SENDER_EMAIL
+                sync: false
+              - key: PORT
+                sync: false
+              - key: REDIS_PASSWORD
+                sync: false
+              - key: REDIS_URL
+                fromService:
+                  name: chatwoot-redis
+                  type: keyvalue
+                  property: connectionString
+              - key: POSTGRES_DATABASE
+                sync: false
+              - key: POSTGRES_PASSWORD
+                fromDatabase:
+                  name: shared-db
+                  property: password
+              - key: POSTGRES_USERNAME
+                sync: false
+              - key: POSTGRES_HOST
+                fromDatabase:
+                  name: shared-db
+                  property: host
+              - key: RAILS_MASTER_KEY
+                sync: false
+              - key: INSTANCE_NAME
+                sync: false
+              - fromGroup: shared-db-config-ace
+            region: frankfurt
+            preDeployCommand: bundle exec rails db:chatwoot_prepare
+            dockerCommand: bundle exec rails s -b 0.0.0.0 -p 3000
+            autoDeployTrigger: commit
+          - type: worker
+            name: staging-chatwoot-worker
+            runtime: image
+            image:
+              url: docker.io/chatwoot/chatwoot:v4.7.0
+            plan: starter
+            envVars:
+              - key: RAILS_MASTER_KEY
+                sync: false
+              - key: SECRET_KEY_BASE
+                sync: false
+              - key: GCS_CREDENTIALS
+                sync: false
+              - key: GCS_BUCKET
+                sync: false
+              - key: GCS_PROJECT
+                sync: false
+              - key: ACTIVE_STORAGE_SERVICE
+                sync: false
+              - key: gcs-creds.json
+                sync: false
+              - key: SMTP_USERNAME
+                sync: false
+              - key: SMTP_TLS
+                sync: false
+              - key: SMTP_SSL
+                sync: false
+              - key: SMTP_PORT
+                sync: false
+              - key: SMTP_PASSWORD
+                sync: false
+              - key: SMTP_OPENSSL_VERIFY_MODE
+                sync: false
+              - key: SMTP_ENABLE_STARTTLS_AUTO
+                sync: false
+              - key: SMTP_DOMAIN
+                sync: false
+              - key: SMTP_AUTHENTICATION
+                sync: false
+              - key: SMTP_ADDRESS
+                sync: false
+              - key: MAILER_SENDER_EMAIL
+                sync: false
+              - key: FRONTEND_URL
+                sync: false
+              - key: REDIS_PASSWORD
+                sync: false
+              - key: REDIS_URL
+                fromService:
+                  name: chatwoot-redis
+                  type: keyvalue
+                  property: connectionString
+              - key: POSTGRES_DATABASE
+                sync: false
+              - key: POSTGRES_PASSWORD
+                fromDatabase:
+                  name: shared-db
+                  property: password
+              - key: POSTGRES_USERNAME
+                sync: false
+              - key: POSTGRES_HOST
+                fromDatabase:
+                  name: shared-db
+                  property: host
+              - key: INSTANCE_NAME
+                sync: false
+              - fromGroup: shared-db-config-ace
+            region: frankfurt
+            dockerCommand: bundle exec sidekiq -C config/sidekiq.yml
+            autoDeployTrigger: commit
+          - type: keyvalue
+            name: staging-chatwoot-redis
+            plan: starter
+            region: frankfurt
+            maxmemoryPolicy: allkeys-lru
+            ipAllowList: []
+        databases:
+          - name: staging-shared-db
+            databaseName: staging_shared_db_psl3
+            user: staging_shared_db_psl3_user
+            plan: basic-256mb
+            region: frankfurt
+            ipAllowList:
+              - source: 0.0.0.0/0
+                description: everywhere
+            postgresMajorVersion: "16"
+            diskSizeGB: 10
